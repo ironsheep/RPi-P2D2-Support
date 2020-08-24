@@ -40,7 +40,21 @@ Here is the header as shown in Peter's P2D2 r5 documents:
 
 Raspberry Pi's are fairly inexpensive devices and all software for them, operating system, applications are free.  RPi's such at the RPi4 with its 8GB ram is touted to be a nearly desktop class linux machine. It is well connected, offering WiFi, wired ethernet, and bluetooth interfaces, USB 2.0 and 3.0. It has wonderfully high resolution (up to 4k 60fps) HDMI output and it has world class open source data analysis and visualization tools available at no cost (open source.)
 
--
+### Configuration Opportunities
+
+We will continually be identifying fun and unique ways to use this hardware pairing. Here i'm staring a list of obvious opportunities I see I'm studying all connections for this pairing.
+
+This will be an ever growing list of things that are possible now with a bit of configuration of the PRi and maybe some lightweight code for the P2 or the RPi:
+
+- Debug console while running apps on P2D2.
+- Root access console to the RPi for apps running on the P2D2.
+- Boot time ID ROM emulation so the RPi can do HAT (Hardware on Top) runtime configuration of drivers.
+- ... many more tba ...
+
+Then there are things we'd like to do but have yet to figure out how:
+
+- Boot-time access to TAQOZ on the P2 from the RPi - would allow us to debug P2 attached hardware using TAQOZ.
+- ... more as we find ...
 
 # Hardware Interaction leading to configuration Choices
 
@@ -106,7 +120,7 @@ You will need to fix clock frequency (and/or configure which UARTs do what) by m
 > 
 > Likewise, This project is in no way affiliated with, authorized, maintained, sponsored or endorsed by *Parallax Inc., dba Parallax Semiconductor* or any of its affiliates or subsidiaries.
 
---
+----
 
 ### [Copyright](copyright) | [License](LICENSE)
 
