@@ -64,7 +64,7 @@ Then there are things we'd like to do but have yet to figure out how:
 ## Interface: 1-Wire
 
 ## Interface: Serial: UART0
-There are two hardware UARTs: miniUART and PL011 that are configured to be primary and secondary [^1] and four additional UARTs [2-5] [^2].
+There are two hardware UARTs: miniUART and PL011 that are configured to be primary and secondary on RPi3 and RPI4. (earlier models are different!) [^1] and four additional UARTs [2-5] [^2].
 
 ### MiniUART (less capable, but fully meets our normal debugging needs)
 
@@ -91,9 +91,23 @@ As an RPi user it is probably cleaner to make as much configuration change as yo
 
 You will need to fix clock frequency (and/or configure which UARTs do what) by modifying the files directly. You can modify these files by hand using 'vi' or 'nano' as your editor but this is slightly  more error prone so we want to be very deliberate here. (You don't want typo's or mis-spellings in these files as stuff just doesn't work right where there are...)
 
+To get to our 2Mb/s we need to adjust the clock fed to the UART. The setting needs to be 
+at least 16X faster than the baud rate we want for our uart. The default is only 3MHz which results in just a little over 115200. So at the default setting, the max UART baud rate is 115200. [^4]
+
+Therefore by adding 
+```
+init_uart_clock=32000000
+``` to /boot/config.txt we can now select a 2Mb/s rate. (*yes, testing shows this works!*)
+
+*Please remember that after adjusting these /boot/ files your changes do not take affect until you reboot the RPi.*
+
 ## Interface: SPI0
 
 ## Interface: I2C SD/SC (Hat ID ROM)
+
+## Interface: Non-tasked GPIOs
+
+If you are using the remaining 15 non-purposed GPIOs then when you decide the purpose and configuration needed for a pin you can set a boot-time configuration entry so the pin you need will be configured correctly from boot.  Entries to do this are placed in ```/boot/config.txt``` [^5]
 
 
 [^1]: Raspberry Pi Doumentation: [UARTs](https://www.raspberrypi.org/documentation/configuration/uart.md)
@@ -101,6 +115,10 @@ You will need to fix clock frequency (and/or configure which UARTs do what) by m
 [^2]: Raspberry Pi Doumentation - UART configuration overlays. Scroll down to: [UARTs and Device Tree](https://www.raspberrypi.org/documentation/configuration/uart.md)
 
 [^3]: SoC Peripheral Doument: [BCM2835 Ref](https://www.raspberrypi.org/documentation/hardware/raspberrypi/bcm2835/BCM2835-ARM-Peripherals.pdf)
+
+[^4]: Raspberry Pi Forums: [Can the UART go faster than 115200?](https://www.raspberrypi.org/forums/viewtopic.php?t=73673) Lot's of repeat information in here along with the details we need.
+
+[^5]: Raspberry Pi Doumentation: [GPIO Control in config.txt](https://www.raspberrypi.org/documentation/configuration/config-txt/gpio.md) read this to learn entry needed for each of the 15 GPIO pins you want to boot-time configure.
 
 ## Credits
 
