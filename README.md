@@ -81,6 +81,7 @@ The second and more capable UART is the **PL011 UART**. This is configured to be
 
 Considerations for use: 
 
+* The PL011 UART is also capable of our P2 deafult 2MBit 8N1 configuration (it too can go higher)
 * If we want to use this UART as UART0 then we need to flip the miniUART to handle the Bluetooth LE device and PL011 to be the primary connecting it to UART0 at our GPIO header.  Alternatively, we can just disable the bluetooth to cause this to happen as well.
 
 ### Serial Boot-time Configuration
@@ -97,7 +98,8 @@ at least 16X faster than the baud rate we want for our uart. The default is only
 Therefore by adding 
 ```
 init_uart_clock=32000000
-``` to /boot/config.txt we can now select a 2Mb/s rate. (*yes, testing shows this works!*)
+``` 
+to /boot/config.txt we can now select a 2Mb/s rate. (*yes, testing shows this works!*)
 
 *Please remember that after adjusting these /boot/ files your changes do not take affect until you reboot the RPi.*
 
