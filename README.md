@@ -169,8 +169,22 @@ max_framebuffers=2
 
 I commented all of these lines out and my RP4 can now display a larger screen when run by VNC.
 
+### General I/O reference for Raspberry Pi
+
+Various hardware models of the RPi have different Broadcom Chips providing the I/O peripheral set. You can identify which your RPi is using by doing:
+
+```
+cat /proc/cpuinfo | grep Hardware
+```
+
+Many of the latest modesl use the BCM2835. Here's a link to the [BCM2835 ARM Peripherals SoC Document](https://www.raspberrypi.org/documentation/hardware/raspberrypi/bcm2835/BCM2835-ARM-Peripherals.pdf)
+
+If this isn't what your RPi is using doing a simple search for your BCM#### will quickly get you to the same doc for your RPi model.
+
+
 ---
 
+### FOOTNOTES
 
 <b id="f1">[1]:</b> Raspberry Pi Forums: [1-Wire Setup Questions](https://www.raspberrypi.org/forums/viewtopic.php?t=176406) various answers but the raspi-config method is the easiest and configures the extra dirver loading, etc. [↩](#a1)
 
@@ -184,9 +198,6 @@ I commented all of these lines out and my RP4 can now display a larger screen wh
 
 <b id="f6">[6]:</b> Raspberry Pi Doumentation: [GPIO Control in config.txt](https://www.raspberrypi.org/documentation/configuration/config-txt/gpio.md) read this to learn entry needed for each of the 15 GPIO pins you want to boot-time configure.[↩](#a6)
 
-
-
-[^3]: SoC Peripheral Doument: [BCM2835 Ref](https://www.raspberrypi.org/documentation/hardware/raspberrypi/bcm2835/BCM2835-ARM-Peripherals.pdf)
 ---
 
 ## Credits
