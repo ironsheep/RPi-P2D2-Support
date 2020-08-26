@@ -169,17 +169,19 @@ max_framebuffers=2
 
 I commented all of these lines out and my RP4 can now display a larger screen when run by VNC.
 
-### General I/O reference for Raspberry Pi
+### Detailed I/O Reference for your Raspberry Pi
 
-Various hardware models of the RPi have different Broadcom Chips providing the I/O peripheral set. You can identify which your RPi is using by doing:
+Much more detailed information on each of the interfaces can be found in the ARM Peripherals document for your model of RPi.
+
+The various hardware models of the RPi have different Broadcom SoC's providing the I/O peripheral set. You can identify which your RPi is built with by doing:
 
 ```
 cat /proc/cpuinfo | grep Hardware
 ```
 
-Many of the latest modesl use the BCM2835. Here's a link to the [BCM2835 ARM Peripherals SoC Document](https://www.raspberrypi.org/documentation/hardware/raspberrypi/bcm2835/BCM2835-ARM-Peripherals.pdf)
+Many of the latest models use the BCM2835. Here's a link to the [BCM2835 ARM Peripherals SoC Document](https://www.raspberrypi.org/documentation/hardware/raspberrypi/bcm2835/BCM2835-ARM-Peripherals.pdf)
 
-If this isn't what your RPi is using doing a simple search for your BCM#### will quickly get you to the same doc for your RPi model.
+If this isn't the chip that your RPi contains, doing a simple search for your BCM#### will quickly get you to the same doc for your RPi model.
 
 
 ---
