@@ -77,7 +77,7 @@ As with any embedded system with many I/O choices sometimes tradeoffs have to be
 Enable the 1-wire interface using raspi-config. There are options for enabling a pull-up on the GPIO pin but most people just wire up their own external resistor.  The driver should default to the GPIO4 pin but it never hurts to double check. <sup name="a1">[1](#f1)</sup>
 
 ## Interface: Serial: UART0
-There are two hardware UARTs: miniUART and PL011 that are configured to be primary and secondary on RPi3 and RPI4. (earlier models are different!) [^1] and four additional UARTs [2-5] [^2].
+There are two hardware UARTs: miniUART and PL011 that are configured to be primary and secondary on RPi3 and RPI4. (earlier models are different!) <sup name="a2">[2](#f2)</sup> and four additional UARTs [2-5] <sup name="a3">[3](#f3)</sup>.
 
 ### MiniUART (less capable, but fully meets our normal debugging needs)
 
@@ -172,9 +172,11 @@ I commented all of these lines out and my RP4 can now display a larger screen wh
 ---
 
 
-[^1]: Raspberry Pi Doumentation: [UARTs](https://www.raspberrypi.org/documentation/configuration/uart.md)
+<b id="f1">[1]:</b> Raspberry Pi Forums: [1-Wire Setup Questions](https://www.raspberrypi.org/forums/viewtopic.php?t=176406) various answers but the raspi-config method is the easiest and configures the extra dirver loading, etc. [↩](#a1)
 
-[^2]: Raspberry Pi Doumentation - UART configuration overlays. Scroll down to: [UARTs and Device Tree](https://www.raspberrypi.org/documentation/configuration/uart.md)
+<b id="f2">[2]:</b> Raspberry Pi Doumentation: [UARTs](https://www.raspberrypi.org/documentation/configuration/uart.md) [↩](#a2)
+
+<b id="f3">[3]:</b> Raspberry Pi Doumentation - UART configuration overlays. Scroll down to: [UARTs and Device Tree](https://www.raspberrypi.org/documentation/configuration/uart.md) [↩](#a3)
 
 [^3]: SoC Peripheral Doument: [BCM2835 Ref](https://www.raspberrypi.org/documentation/hardware/raspberrypi/bcm2835/BCM2835-ARM-Peripherals.pdf)
 
@@ -183,8 +185,6 @@ I commented all of these lines out and my RP4 can now display a larger screen wh
 [^5]: Raspberry Pi Doumentation: [GPIO Control in config.txt](https://www.raspberrypi.org/documentation/configuration/config-txt/gpio.md) read this to learn entry needed for each of the 15 GPIO pins you want to boot-time configure.
 
 [^6]: Raspberry Pi Forums: [Set VNC resolution?](https://www.raspberrypi.org/forums/viewtopic.php?t=200196) (Scroll down to Thu Jan 04,2018 10:20pm post.)
-
-<b id="f1">1</b> Raspberry Pi Forums: [1-Wire Setup Questions](https://www.raspberrypi.org/forums/viewtopic.php?t=176406) various answers but the raspi-config method is the easiest and configures the extra dirver loading, etc. [↩](#a1)
 
 ---
 
