@@ -28,6 +28,7 @@ project_url = 'https://github.com/ironsheep/RPi-P2D2-Support'
 if False:
     # will be caught by python 2.7 to be illegal syntax
     print_line('Sorry, this script requires a python3 runtime environment.', file=sys.stderr)
+    os._exit(1)
 
 sg.theme('GreenMono')
 
@@ -127,24 +128,101 @@ def existsNamedWindow(name):
 def getNamedWindow(name):
     return namedWindows.get(name, '')
 
-def parseCreateTermOptions(lineParts, skip=0):
+kTypeString = 'string'
+kTypeInteger = 'int'
+kTypeColor = 'color'
+
+valTableTerm = [
+    ( 'TITLE', kTypeString ),
+    ( 'POS', kTypeInteger, kTypeInteger ),
+    ( 'SIZE', kTypeInteger, kTypeInteger ),
+    ( 'TEXTSIZE', kTypeInteger ),
+    ( 'TEXTCOLOR', kTypeColor, kTypeColor ),
+    ( 'BACKCOLOR', kTypeColor ),
+    ( 'UPDATE' ),
+]
+
+def getValidationTuple(table, parameterName):
+    print_line('table=[{}], parameterName=[{}]'.format('tbl-??', parameterName), debug=True)
+    desiredValTuple = ''
+    validStatus = False
+    searchTerm = parameterName.lower()
+    for tupleIndex in range(len(table)):
+        currTuple = table[tupleIndex]
+        keyword = currTuple[0].lower()
+        if keyword == searchTerm:
+            desiredValTuple = currTuple
+            validStatus = True
+            break;
+
+    print_line('-> tuple=[{}], valid={}'.format(desiredValTuple, validStatus), debug=True)
+    return desiredValTuple, validStatus
+
+def intForColorString(colorString):
+    return
+
+def interpretArgument(argument, validationType):
+    print_line('argument=[{}], validationType=[{}]'.format(argument, validationType), debug=True)
+    interpValue = ''
+    validStatus = True
+    if validationType == kTypeString:
+        interpValue = argument
+    elif validationType == kTypeInteger:
+        interpValue = int(argument)
+    elif validationType == kTypeColor:
+        interpValue = intForColorString(argument)
+    else:
+        print_line('ERROR: Unknown validation Type=[{}]'.format(validationType), error=True)
+        validStatus = False
+
+    print_line('-> interpValue=[{}], valid={}'.format(interpValue, validStatus), debug=True)
+    return interpValue, validStatus
+
+def parseOptions(lineParts, valTable, skip=0):
     # process line parts into tuples
     #  returning (tuples, valid flag)
     optionTuples = []
-    validStatus = False
+    validStatus = True
+    maxParts = len(lineParts)
+    currIndex = skip
+    while currIndex < maxParts:
+        validationTuple, valid = getValidationTuple(valTable, lineParts[currIndex])
+        fieldValues = []
+        if valid == False:
+            validStatus = False
+            break
+        else:
+            # now gather needed values into list then into new tuple
+            fieldValues.append(lineParts[currIndex])
+            if len(validationTuple) > 1:
+                for fieldIndex in range(len(validationTuple) - 1):
+                    currIndex += 1
+                    parsedValue, valid = interpretArgument(lineParts[currIndex], validationTuple[fieldIndex+1])
+                    if valid == True:
+                        fieldValues.append(parsedValue)
+                    else:
+                        validStatus = False
+                        break;
+                if validStatus == False:
+                    break
 
+            currIndex += 1  # point past only/final value
+            optionTuples.append(tuple(fieldValues))
+
+    print_line('-> tuples=[{}], valid={}'.format(optionTuples, validStatus), debug=True)
     return optionTuples, validStatus
+
 
 def opCreateTermWindow(cmdString):
     """
     ---------------------------------------------------------------------------------------
-    TERM		config:	TITLE 'Title String'		'override default caption
-                POS screen_x screen_y		'default is 0 0
-                SIZE columns rows		'default is 80 25
-                TEXTSIZE text_size_6_to_200	'default is current text editor size
-                TEXTCOLOR text0 back0 ...	'define text and back colors for settings 0..3
-                BACKCOLOR color_rrggbb		'set background color
-                UPDATE				'set 'update' mode
+    TERM config:	TITLE 'Title String'		'override default caption
+                    POS screen_x screen_y		'default is 0 0
+                    SIZE columns rows		'default is 80 25
+                    TEXTSIZE text_size_6_to_200	'default is current text editor size
+                    TEXTCOLOR text0 back0 ...	'define text and back colors for settings 0..3
+                    BACKCOLOR color_rrggbb		'set background color
+                    UPDATE				'set 'update' mode
 
 		feed:	0 = Clear			'control characters
                 1 = Home
@@ -170,11 +248,14 @@ def opCreateTermWindow(cmdString):
     lineParts = cmdString.split()
     if len(lineParts) > 2 and lineParts[1] == '`term':
         newWindowName = lineParts[2]
+        print_line('newWindowName=[{}]'.format(newWindowName), debug=True)
         # create the desired window
         # EXAMPLE:
         #   Cog0  `term temp size 80 16 textsize 10
-        settingsTuples, valid = parseCreateTermOptions(lineParts, skip=2)
+        settingsTuples, valid = parseOptions(lineParts, valTableTerm, skip=3)
+        #if valid == True:
 
+        os._exit(1) # test exit!!!
         # remember the window
     else:
         print_line('BAD Window Create command [{}]'.format(cmdString), error=True)
@@ -189,7 +270,7 @@ def opSendToWindow(cmdString):
 
 def functionForCommand(opId):
     table = {
-        "'term" : opCreateTermWindow,
+        "`term" : opCreateTermWindow,
         "INIT" : opJustLogIt,
     }
     # get() method of dictionary data type returns
@@ -280,4 +361,5 @@ try:
 
 finally:
     # normal shutdown
+    debugLogWindow.close()
     print_line('Done', info=True)
