@@ -253,20 +253,54 @@ def opCreateTermWindow(cmdString):
         # EXAMPLE:
         #   Cog0  `term temp size 80 16 textsize 10
         settingsTuples, valid = parseOptions(lineParts, valTableTerm, skip=3)
-        #if valid == True:
+        if valid == True:
+            # configure the window
+            windowTitle = '{} TERM'.format(newWindowName)
+            windowWidth = 80
+            windowHeight = 25
+            windowX = 0
+            windowY = 0
+            fontSize = 10
+            for tupleIndex in range(len(settingsTuples)):
+                currOption = settingsTuples[tupleIndex]
+                if currOption[0].upper() == 'SIZE':
+                    windowWidth = currOption[1]
+                    windowWidth = currOption[2]
+                elif currOption[0].upper() == 'TEXTSIZE':
+                    fontSize = currOption[1]
 
-        os._exit(1) # test exit!!!
-        # remember the window
+            # create our TERM window
+            layout = [ [sg.Multiline(size=(windowWidth, windowHeight), autoscroll=True, key=DEBUG_MULTILINE_KEY)] ]
+            window = sg.Window(title=windowTitle, layout=layout, location=(windowX, windowY), finalize=True)
+
+            # remember the window
+            addNamedWindow(newWindowName, window)
+        else:
+            os._exit(1) # PARSE FAIL exit!!!
+
     else:
         print_line('BAD Window Create command [{}]'.format(cmdString), error=True)
-
+        os._exit(1) # PARSE FAIL exit!!!
 
 def opJustLogIt(cmdString):
     print_line('opJustLogIt({})'.format(cmdString), debug=True)
 
+def filterThenWrite(rawValue, targetWindow):
+    filteredValue = rawValue
+    targetWindow[DEBUG_MULTILINE_KEY].update(filteredValue, append=True)
+
 def opSendToWindow(cmdString):
     lineParts = cmdString.split()
     print_line('opSendToWindow(window=[{}], value=[{}])'.format(lineParts[1], cmdString), debug=True)
+    # EXAMPLE:
+    #   Cog0  `temp 'Xpin=24, Ypin=25' 13
+    linePrefix = '{} {} '.format(lineParts[0], lineParts[1])
+    lineWoPrefix = cmdString.replace(linePrefix,'')
+    targetWindowName = lineParts[1].replace("`", '')
+    if existsNamedWindow(targetWindowName):
+        targetWindow = getNamedWindow(targetWindowName)
+        filterThenWrite(lineWoPrefix, targetWindow)
+
 
 def functionForCommand(opId):
     table = {
