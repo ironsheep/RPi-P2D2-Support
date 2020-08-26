@@ -9,6 +9,11 @@ __pycache__/
 # macOS finder stuff
 .DS_Store
 
+# local files we don't version
+DEBUG_Displays.spin2
+charlie_rpi_debug.out
+read_serial.py
+
 # Distribution / packaging
 .Python
 build/
