@@ -187,6 +187,7 @@ If this isn't the chip that your RPi contains, doing a simple search for your BC
 ---
 
 ### FOOTNOTES
+*(click the return arrow to get back to the referencing text)*
 
 <b id="f1">[1]:</b> Raspberry Pi Forums: [1-Wire Setup Questions](https://www.raspberrypi.org/forums/viewtopic.php?t=176406) various answers but the raspi-config method is the easiest and configures the extra dirver loading, etc. [↩](#a1)
 
