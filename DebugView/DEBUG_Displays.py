@@ -265,7 +265,7 @@ def opCreateTermWindow(cmdString):
                 currOption = settingsTuples[tupleIndex]
                 if currOption[0].upper() == 'SIZE':
                     windowWidth = currOption[1]
-                    windowWidth = currOption[2]
+                    windowHeight = currOption[2]
                 elif currOption[0].upper() == 'TEXTSIZE':
                     fontSize = currOption[1]
 
