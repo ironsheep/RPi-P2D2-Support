@@ -42,7 +42,7 @@ Raspberry Pi's are fairly inexpensive devices and all software for them, operati
 
 ### Configuration Opportunities
 
-We will continually be identifying fun and unique ways to use this hardware pairing. Here i'm staring a list of obvious opportunities I see I'm studying all connections for this pairing.
+We will continually be identifying fun and unique ways to use this hardware pairing. Here i'm starting a list of obvious opportunities I see I'm studying all connections for this pairing.
 
 This will be an ever growing list of things that are possible now with a bit of configuration of the PRi and maybe some lightweight code for the P2 or the RPi:
 
@@ -58,10 +58,23 @@ Then there are things we'd like to do but have yet to figure out how:
 
 # Hardware Interaction leading to configuration Choices
 
+As with any embedded system with many I/O choices sometimes tradeoffs have to be made to use certain capabilities (to get one to operate maybe you have to disable another, etc.)  I put this README together so I could annotate here for us all any such tradeoff issues I find.  So far, the Serial port is the one where we have more choices to make. The following sections (one for each interface) provide any details I've found to date.
+
+**NOTE: Turn on Interfaces you need.** The hardware interfaces at the GPIO connector are generally turned off by default. You will want to use **raspi-config** to enable each of the interfaces you wish to use.  
+
+**Language Choices:** I tend to use Python or ANSI C for interacting with the various devices as there are a lot of rich examples and library support. However there are a number of other languages you could choose to use.  
+
+**NOTE:** While most software including Python itself is installed using **apt-get install {package}** Some of the lesser used Python packages will need to be installed using using **pip(3) install {package}** as they may not be prepackaged for **apt-get** installation.
+
+
 
 ## Interface: I2C0
 
+... TBA ...
+
 ## Interface: 1-Wire
+
+Enable the 1-wire interface using raspi-config. There are options for enabling a pull-up on the GPIO pin but most people just wire up their own external resistor.  The driver should default to the GPIO4 pin but it never hurts to double check. [^7]
 
 ## Interface: Serial: UART0
 There are two hardware UARTs: miniUART and PL011 that are configured to be primary and secondary on RPi3 and RPI4. (earlier models are different!) [^1] and four additional UARTs [2-5] [^2].
@@ -105,7 +118,11 @@ to /boot/config.txt we can now select a 2Mb/s rate. (*yes, testing shows this wo
 
 ## Interface: SPI0
 
+... TBA ...
+
 ## Interface: I2C SD/SC (Hat ID ROM)
+
+... TBA ...
 
 ## Interface: Non-tasked GPIOs
 
@@ -165,6 +182,8 @@ I commented all of these lines out and my RP4 can now display a larger screen wh
 [^5]: Raspberry Pi Doumentation: [GPIO Control in config.txt](https://www.raspberrypi.org/documentation/configuration/config-txt/gpio.md) read this to learn entry needed for each of the 15 GPIO pins you want to boot-time configure.
 
 [^6]: Raspberry Pi Forums: [Set VNC resolution?](https://www.raspberrypi.org/forums/viewtopic.php?t=200196) (Scroll down to Thu Jan 04,2018 10:20pm post.)
+
+[^7]: Raspberry Pi Forums: [1-Wire Setup Questions](https://www.raspberrypi.org/forums/viewtopic.php?t=176406) various answers but the raspi-config method is the easiest and configures the extra dirver loading, etc.
 
 ## Credits
 
