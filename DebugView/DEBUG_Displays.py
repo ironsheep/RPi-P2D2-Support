@@ -255,7 +255,7 @@ def opCreateTermWindow(cmdString):
         settingsTuples, valid = parseOptions(lineParts, valTableTerm, skip=3)
         if valid == True:
             # configure the window
-            windowTitle = '{} TERM'.format(newWindowName)
+            windowTitle = '{} - TERM'.format(newWindowName)
             windowWidth = 80
             windowHeight = 25
             windowX = 0
@@ -286,7 +286,7 @@ def opJustLogIt(cmdString):
     print_line('opJustLogIt({})'.format(cmdString), debug=True)
 
 def filterThenWrite(rawValue, targetWindow):
-    filteredValue = rawValue
+    filteredValue = rawValue.replace(' 13','\n')
     targetWindow[DEBUG_MULTILINE_KEY].update(filteredValue, append=True)
 
 def opSendToWindow(cmdString):
@@ -294,12 +294,11 @@ def opSendToWindow(cmdString):
     print_line('opSendToWindow(window=[{}], value=[{}])'.format(lineParts[1], cmdString), debug=True)
     # EXAMPLE:
     #   Cog0  `temp 'Xpin=24, Ypin=25' 13
-    linePrefix = '{} {} '.format(lineParts[0], lineParts[1])
-    lineWoPrefix = cmdString.replace(linePrefix,'')
+    lineForTerm = ' '.join(lineParts[2:])
     targetWindowName = lineParts[1].replace("`", '')
     if existsNamedWindow(targetWindowName):
         targetWindow = getNamedWindow(targetWindowName)
-        filterThenWrite(lineWoPrefix, targetWindow)
+        filterThenWrite(lineForTerm, targetWindow)
 
 
 def functionForCommand(opId):
