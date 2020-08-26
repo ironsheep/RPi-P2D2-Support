@@ -111,6 +111,48 @@ to /boot/config.txt we can now select a 2Mb/s rate. (*yes, testing shows this wo
 
 If you are using the remaining 15 non-purposed GPIOs then when you decide the purpose and configuration needed for a pin you can set a boot-time configuration entry so the pin you need will be configured correctly from boot.  Entries to do this are placed in ```/boot/config.txt``` [^5]
 
+## Special Setup Notes
+
+### Run RPi's remotely using VNC
+
+To set up your raspbery pi to display it's desktop remotely there are a couple of adjustments  you'll want to make:
+
+1. Enable VNC (SSH too if you use it)
+1. If no display attached, config RPi for headless operation
+1. set display resolution as desired I use 
+1. if using RP4 disable special driver blocking screen resizing [^6]
+
+The first (1) enable VNC(SSH), (2) enable headless mode and (3) set resolution are handled in raspi-config:
+
+* sudo raspi-config
+* arrow down to "Interfacing Options" and press return
+* arrow down to "P2 SSH" and press return
+* TAB so that < YES > is selected and press return
+* press return for confirmation < OK > and you're back at the main screen
+* arrow down to "Interfacing Options" and press return
+* arrow down to "P3 VNC" and press return
+* TAB so that < YES > is selected and press return
+* press return for confirmation < OK > and you're back at the main screen
+* arrow down to "Advanced Options" and press return
+* arrow down to "A5 Resolution" and press return
+* Arrow down to "DMT mode 82 1920x1080 60Hz 16:9" (or select the mode you want) and press return
+* press return "OK" on confirmation screen (you should arrive back at the main screen)
+* press TAB, TAB to select < finish > and press return
+
+(now your RPi will reboot if changes were made.)
+
+For (4) I found that on RPi4's there's a video driver enabled by default which interferes and is enabled in /boot/config.txt:
+
+```shell
+[pi4]
+# Enable DRM VC4 V3d driver on top of the dispmanx display stack
+droverlay=vc4-fkms-v3d
+max_framebuffers=2 
+```
+
+I commented all of these lines out and my RP4 can now display a larger screen when run by VNC.
+
+
 
 [^1]: Raspberry Pi Doumentation: [UARTs](https://www.raspberrypi.org/documentation/configuration/uart.md)
 
@@ -121,6 +163,8 @@ If you are using the remaining 15 non-purposed GPIOs then when you decide the pu
 [^4]: Raspberry Pi Forums: [Can the UART go faster than 115200?](https://www.raspberrypi.org/forums/viewtopic.php?t=73673) Lot's of repeat information in here along with the details we need.
 
 [^5]: Raspberry Pi Doumentation: [GPIO Control in config.txt](https://www.raspberrypi.org/documentation/configuration/config-txt/gpio.md) read this to learn entry needed for each of the 15 GPIO pins you want to boot-time configure.
+
+[^6]: Raspberry Pi Forums: [Set VNC resolution?](https://www.raspberrypi.org/forums/viewtopic.php?t=200196) (Scroll down to Thu Jan 04,2018 10:20pm post.)
 
 ## Credits
 
