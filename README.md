@@ -169,6 +169,7 @@ max_framebuffers=2
 
 I commented all of these lines out and my RP4 can now display a larger screen when run by VNC.
 
+----
 
 
 [^1]: Raspberry Pi Doumentation: [UARTs](https://www.raspberrypi.org/documentation/configuration/uart.md)
@@ -184,6 +185,8 @@ I commented all of these lines out and my RP4 can now display a larger screen wh
 [^6]: Raspberry Pi Forums: [Set VNC resolution?](https://www.raspberrypi.org/forums/viewtopic.php?t=200196) (Scroll down to Thu Jan 04,2018 10:20pm post.)
 
 [^7]: Raspberry Pi Forums: [1-Wire Setup Questions](https://www.raspberrypi.org/forums/viewtopic.php?t=176406) various answers but the raspi-config method is the easiest and configures the extra dirver loading, etc.
+
+
 
 ## Credits
 
