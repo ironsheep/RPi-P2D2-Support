@@ -89,6 +89,8 @@ lineBuffer = deque()
 
 def pushLine(newLine):
     lineBuffer.append(newLine)
+    if len(lineBuffer) % 10 == 0:
+        print_line('- lines({})'.format(len(lineBuffer)),debug=True)
 
 def popLine():
     global lineBuffer
@@ -106,7 +108,7 @@ def taskProcessInput():
         lines = test_file.readlines()
         for currLine in lines:
             pushLine(currLine)
-            sleep(0.1)
+            #sleep(0.1)
     else:
         ser = serial.Serial ("/dev/serial0", 2000000, timeout=1)    #Open port with baud rate & timeout
         while True:
