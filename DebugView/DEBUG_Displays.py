@@ -53,6 +53,10 @@ def print_line(text, error=False, warning=False, info=False, verbose=False, debu
         else:
             print(Fore.GREEN + '[{}] '.format(timestamp) + Style.RESET_ALL + '{}'.format(text) + Style.RESET_ALL)
 
+# -----------------------------------------------------------------------------
+#  Script Argument parsing
+# -----------------------------------------------------------------------------
+
 # Argparse
 opt_debug = False
 opt_verbose = False
@@ -77,6 +81,9 @@ if opt_debug:
 if opt_useTestFile:
     print_line('TEST: debug stream is test file', debug=True)
 
+# -----------------------------------------------------------------------------
+#  Circular queue for serial input lines & input task
+# -----------------------------------------------------------------------------
 
 lineBuffer = deque()
 
@@ -91,15 +98,15 @@ def popLine():
     return oldestLine
 
 
-def processInput():
-    print_line('Thread: processInput() started', verbose=True)
+def taskProcessInput():
+    print_line('Thread: taskProcessInput() started', verbose=True)
     # process lies from serial or from test file
     if opt_useTestFile == True:
         test_file=open("charlie_rpi_debug.out", "r")
         lines = test_file.readlines()
         for currLine in lines:
             pushLine(currLine)
-            sleep(0.25)
+            sleep(0.1)
     else:
         ser = serial.Serial ("/dev/serial0", 2000000, timeout=1)    #Open port with baud rate & timeout
         while True:
@@ -108,25 +115,170 @@ def processInput():
             if len(currLine) > 0:
                 pushLine(currLine)
 
-namedWindows = {}
+# -----------------------------------------------------------------------------
+#  Named window support
+# -----------------------------------------------------------------------------
+
+kWindowTypeTerm = 'term'
+kWindowTypeLogic = 'logic'
+kWindowTypeLogic = 'scope'
+
+windowsByName = {}
+windowTypeByName = {}
 debugViewsShowing = False
+kNoSuchWindow = ''
 
-
-def addNamedWindow(name, window):
-    global namedWindows
-    if existsNamedWindow(name) == False:
-        namedWindows[name] = window
+def removeNamedWindow(name):
+    global windowsByName
+    global windowTypeByName
+    if existsNamedWindow(name):
+        windowsByName.pop(name)
+    if existsTypeForNamedWindow(name):
+        windowTypeByName.pop(name)
+    if existsNamedWindow(name) or existsTypeForNamedWindow(name):
+        print_line('ERROR: Failed to remove window [{}]!'.format(name), error=True)
     else:
+        print_line('removeNamedWindow({}) - REMOVED'.format(name), debug=True)
+
+def addNamedWindow(name, window, type):
+    global windowsByName
+    global windowTypeByName
+    if existsNamedWindow(name) == True or existsTypeForNamedWindow(name) == True:
         print_line('NAME {} already in windows list, SKIPPED!'.format(name), error=True)
+    else:
+        windowsByName[name] = window
+        windowTypeByName[name] = type
+        print_line('addNamedWindow({}, {}) - ADDED'.format(name, type), debug=True)
 
 def existsNamedWindow(name):
     foundStatus = True
-    if getNamedWindow(name) == '':
+    if getNamedWindow(name) == kNoSuchWindow:
         foundStatus = False
     return foundStatus
 
 def getNamedWindow(name):
-    return namedWindows.get(name, '')
+    return windowsByName.get(name, kNoSuchWindow)
+
+def addTypeForNamedWindow(name, type):
+    global windowTypeByName
+    if existsTypeForNamedWindow(name) == False:
+        windowTypeByName[name] = type
+    else:
+        print_line('NAME {} already in windows list, SKIPPED!'.format(name), error=True)
+
+def existsTypeForNamedWindow(name):
+    foundStatus = True
+    if getTypeForNamedWindow(name) == kNoSuchWindow:
+        foundStatus = False
+    return foundStatus
+
+def getTypeForNamedWindow(name):
+    return windowTypeByName.get(name, kNoSuchWindow)
+
+
+
+    """
+    CONSTANTS From Chips code
+
+    clLime                = $00FF00;
+    clRed                 = $0000FF;
+    clBlue                = $FF3F00;
+    clYellow              = $00FFFF;
+    clMagenta             = $FF00FF;
+    clAqua                = $FFFF00;
+    clOrange              = $007FFF;
+    clOlive               = $007F7F;
+    clWhite               = $FFFFFF;
+    clBlack               = $000000;
+    clGrey                = $404040;
+    DefaultBackColor      = clBlack;
+    DefaultGridColor      = clGrey;
+    DefaultLineColor      = clAqua;
+    DefaultFillColor      = clBlue;
+    DefaultTextColor      = clYellow;
+    DefaultColor          = clAqua;
+
+    DefaultLineSize       = 1;
+    DefaultDotSize        = 1;
+    DefaultTextSize       = 10;
+    DefaultTextStyle      = 0;
+
+    DefaultCols           = 80;
+    DefaultRows           = 25;
+
+    scope_wmin            = 32;
+    scope_wmax            = 2048;
+    scope_hmin            = 32;
+    scope_hmax            = 2048;
+
+    scope_xy_wmin         = 32;
+    scope_xy_wmax         = 2048;
+
+    plot_wmin             = 32;
+    plot_wmax             = 2048;
+    plot_hmin             = 32;
+    plot_hmax             = 2048;
+
+    term_colmin           = 1;
+    term_colmax           = 256;
+    term_rowmin           = 1;
+    term_rowmax           = 128;
+
+    DefaultScopeColors    : array[0..7] of integer = (clLime, clRed, clAqua, clYellow, clMagenta, clBlue, clOrange, clOlive);
+    DefaultTermColors     : array[0..7] of integer = (clOrange, clBlack, clYellow, clBlack, clAqua, clBlack, clLime, clBlack);
+    """
+
+clLime                = "#00FF00"
+clRed                 = "#FF0000"
+clBlue                = "#003FFF"
+clYellow              = "#FFFF00"
+clMagenta             = "#FF00FF"
+clAqua                = "#00FFFF"
+clOrange              = "#FF7F00"
+clOlive               = "#7F7F00"
+clWhite               = "#FFFFFF"
+clBlack               = "#000000"
+clGrey                = "#404040"
+clGreen               = "#00FF00"
+DefaultBackColor      = clBlack
+DefaultGridColor      = clGrey
+DefaultLineColor      = clAqua
+DefaultFillColor      = clBlue
+DefaultTextColor      = clYellow
+DefaultColor          = clAqua
+
+DefaultLineSize       = 1
+DefaultDotSize        = 1
+DefaultTextSize       = 10
+DefaultTextStyle      = 0
+
+DefaultCols           = 80
+DefaultRows           = 25
+
+scope_wmin            = 32
+scope_wmax            = 2048
+scope_hmin            = 32
+scope_hmax            = 2048
+
+scope_xy_wmin         = 32
+scope_xy_wmax         = 2048
+
+plot_wmin             = 32
+plot_wmax             = 2048
+plot_hmin             = 32
+plot_hmax             = 2048
+
+term_colmin           = 1
+term_colmax           = 256
+term_rowmin           = 1
+term_rowmax           = 128
+
+DefaultScopeColors    = [ clLime, clRed, clAqua, clYellow, clMagenta, clBlue, clOrange, clOlive ]
+DefaultTermColors     = [ clOrange, clBlack, clYellow, clBlack, clAqua, clBlack, clLime, clBlack ]
+
+# -----------------------------------------------------------------------------
+#  Debug output parsing support
+# -----------------------------------------------------------------------------
 
 kTypeString = 'string'
 kTypeInteger = 'int'
@@ -159,6 +311,9 @@ def getValidationTuple(table, parameterName):
     return desiredValTuple, validStatus
 
 def intForColorString(colorString):
+    # % means binary ^2
+    # %% quarternary ^4
+    # $ means hex ^16
     return
 
 def interpretArgument(argument, validationType):
@@ -212,39 +367,142 @@ def parseOptions(lineParts, valTable, skip=0):
     print_line('-> tuples=[{}], valid={}'.format(optionTuples, validStatus), debug=True)
     return optionTuples, validStatus
 
+# -----------------------------------------------------------------------------
+#  Debug driven FEED a Window operations
+# -----------------------------------------------------------------------------
+
+kTermControlList = [ '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '13', 'CLEAR', 'UPDATE', 'SAVE', 'CLOSE' ]
+windowCloseRequested = False
+
+def buildTermList(rawValue):
+    """
+    TERM feed:
+        0 = Clear			'control characters
+        1 = Home
+        2 = Set colum, column follows
+        3 = Set row, row follows
+        4 = Set color 0
+        5 = Set color 1
+        6 = Set color 2
+        7 = Set color 3
+        8 = Backspace			'printable characters
+        9 = Tab
+        13 = New line
+        >31 = chr
+        'string'			'print string
+        CLEAR				'clear display
+        UPDATE				'update display (only needed in 'update' mode)
+        SAVE 'filename'			'save display as filename.bmp
+        CLOSE				'close display, frees name
+    """
+    desiredOperations = []
+    validStatus = True
+    lineParts = rawValue.split()
+    inString = False
+    currString = ''
+    skipNext = False
+    for partIndex in range(len(lineParts)):
+        currPart = lineParts[partIndex]
+        if skipNext == True:
+            skipNext = False
+            continue
+        if inString == True:
+            # append this to string
+            currString = '{} {}'.format(currString, currPart)
+            if "'" in currPart:
+                # end this string, it is closed
+                newOpTuple = ( currString.replace("'",''), '' )
+                desiredOperations.append( newOpTuple )
+                inString = False
+                currString = ''
+        elif "'" in currPart:
+            if inString == False:
+                # start a new string
+                currString = currPart
+                inString = True
+        elif currPart in kTermControlList:
+            # have numeric directive!
+            if currPart == 'CLEAR':  # have 2nd form of clear, make it first form
+                # have clear screen
+                desiredOperations.append( ( '0', '' ) )
+            elif currPart == '2' or currPart == '3' or currPart == 'SAVE':  # have ROW
+                # MAYBE BUG: fix whitespace in filename case?!
+                newOpTuple  = ( currPart, lineParts[partIndex + 1] )
+                skipNext = True
+                desiredOperations.append( newOpTuple )
+            else:
+                desiredOperations.append( ( currPart, '' ) )
+        else:
+            # BAD directive!
+            print_line('ERROR: unknown TERM directive [{}] in [{}]'.format(currPart, rawValue), error=True)
+            validStatus = False
+    print_line('-> desiredOperations({})=[{}], valid={}'.format(len(desiredOperations), desiredOperations, validStatus), debug=True)
+    return desiredOperations, validStatus
+
+def feedTermWindow(rawValue, targetWindow):
+    global windowCloseRequested
+    writeOperationList, valid = buildTermList(rawValue)
+    textColor = DefaultTermColors[0]  # 0,1 are default FG,BG colors
+    backgroundColor = DefaultTermColors[1]  # 0,1 are default FG,BG colors
+    if valid == True:
+        for currOp in writeOperationList:
+            print_line('currOp[{}]=[{}]'.format(len(currOp), currOp[0]), debug=True)
+            currValue = currOp[0]
+            if currValue == '0':
+                # clear the display
+                targetWindow[DEBUG_MULTILINE_KEY].update('', append=False)
+            elif currValue.upper() == 'CLOSE':
+                # close the window
+                windowCloseRequested = True
+            elif currValue.upper() == 'UPDATE':
+                print_line('WARNING: UPDATE - not yet supported'.format(), warning=True)
+            elif currValue.upper() == 'SAVE':
+                print_line('WARNING: SAVE to {} - not yet supported'.format(currOp[1]), warning=True)
+            elif currValue.upper() == '4':
+                textColor = DefaultTermColors[0]  # 0,1 are default FG,BG colors
+                backgroundColor = DefaultTermColors[1]  # 0,1 are default FG,BG colors
+            elif currValue.upper() == '5':
+                textColor = DefaultTermColors[2]  # 0,1 are default FG,BG colors
+                backgroundColor = DefaultTermColors[3]  # 0,1 are default FG,BG colors
+            elif currValue.upper() == '6':
+                textColor = DefaultTermColors[4]  # 0,1 are default FG,BG colors
+                backgroundColor = DefaultTermColors[5]  # 0,1 are default FG,BG colors
+            elif currValue.upper() == '7':
+                textColor = DefaultTermColors[6]  # 0,1 are default FG,BG colors
+                backgroundColor = DefaultTermColors[7]  # 0,1 are default FG,BG colors
+            elif currValue.upper() == '9':
+                # write a tab
+                targetWindow[DEBUG_MULTILINE_KEY].update('\t', append=True)
+            elif currValue.upper() == '13':
+                # write a newline
+                targetWindow[DEBUG_MULTILINE_KEY].update('\n', append=True)
+            else:
+                print_line('currValue=[{}], fg=[{}], bg=[{}]'.format(currValue, textColor, backgroundColor), debug=True)
+                targetWindow[DEBUG_MULTILINE_KEY].update(currValue, text_color=textColor, background_color=backgroundColor, append=True)
+    else:
+        print_line('ERROR: invalid parse of [{}]'.format(rawValue), error=True)
+
+def feedBadWindowType(rawValue, targetWindow):
+    print_line('ERROR: no window for [{}]'.format(rawValue), error=True)
+
+
+# -----------------------------------------------------------------------------
+#  Debug driven CREATE/ROUTE operations
+# -----------------------------------------------------------------------------
 
 def opCreateTermWindow(cmdString):
+    print_line('opCreateWindow({})'.format(cmdString), debug=True)
     """
     ---------------------------------------------------------------------------------------
     TERM config:	TITLE 'Title String'		'override default caption
                     POS screen_x screen_y		'default is 0 0
-                    SIZE columns rows		'default is 80 25
+                    SIZE columns rows	        'default is 80 25
                     TEXTSIZE text_size_6_to_200	'default is current text editor size
-                    TEXTCOLOR text0 back0 ...	'define text and back colors for settings 0..3
+                    TEXTCOLOR text0 back0 ...	'define text and back colors for settings pairs 0..3
                     BACKCOLOR color_rrggbb		'set background color
-                    UPDATE				'set 'update' mode
-
-		feed:	0 = Clear			'control characters
-                1 = Home
-                2 = Set colum, column follows
-                3 = Set row, row follows
-                4 = Set color 0
-                5 = Set color 1
-                6 = Set color 2
-                7 = Set color 3
-                8 = Backspace			'printable characters
-                9 = Tab
-                13 = New line
-                >31 = chr
-                'string'			'print string
-                CLEAR				'clear display
-                UPDATE				'update display (only needed in 'update' mode)
-                SAVE 'filename'			'save display as filename.bmp
-                CLOSE				'close display, frees name
-
+                    UPDATE	                    'set 'update' mode
     ---------------------------------------------------------------------------------------
     """
-    print_line('opCreateWindow({})'.format(cmdString), debug=True)
     lineParts = cmdString.split()
     if len(lineParts) > 2 and lineParts[1] == '`term':
         newWindowName = lineParts[2]
@@ -256,11 +514,13 @@ def opCreateTermWindow(cmdString):
         if valid == True:
             # configure the window
             windowTitle = '{} - TERM'.format(newWindowName)
-            windowWidth = 80
-            windowHeight = 25
+            windowWidth = DefaultCols
+            windowHeight = DefaultRows
             windowX = 0
             windowY = 0
-            fontSize = 10
+            fontSize = DefaultTextSize
+            foregroundColor = DefaultTermColors[0]  # 0,1 are default FG,BG colors
+            backgroundColor = DefaultTermColors[1]  # 0,1 are default FG,BG colors
             for tupleIndex in range(len(settingsTuples)):
                 currOption = settingsTuples[tupleIndex]
                 if currOption[0].upper() == 'SIZE':
@@ -268,16 +528,21 @@ def opCreateTermWindow(cmdString):
                     windowHeight = currOption[2]
                 elif currOption[0].upper() == 'TEXTSIZE':
                     fontSize = currOption[1]
-
+                elif currOption[0].upper() == 'BACKCOLOR':
+                    backgroundColor = currOption[1]
+                elif currOption[0].upper() == 'POS':
+                    windowX = currOption[1]
+                    windowY = currOption[2]
+                elif currOption[0].upper() == 'TITLE':
+                    windowTitle = currOption[1]
             # create our TERM window
-            layout = [ [sg.Multiline(size=(windowWidth, windowHeight), autoscroll=True, key=DEBUG_MULTILINE_KEY)] ]
+            layout = [ [sg.Multiline(size=(windowWidth, windowHeight), write_only=True, background_color=backgroundColor, font=("Helvetica", fontSize), text_color=foregroundColor, autoscroll=True, key=DEBUG_MULTILINE_KEY)] ]
             window = sg.Window(title=windowTitle, layout=layout, location=(windowX, windowY), finalize=True)
 
             # remember the window
-            addNamedWindow(newWindowName, window)
+            addNamedWindow(newWindowName, window, kWindowTypeTerm)
         else:
             os._exit(1) # PARSE FAIL exit!!!
-
     else:
         print_line('BAD Window Create command [{}]'.format(cmdString), error=True)
         os._exit(1) # PARSE FAIL exit!!!
@@ -285,11 +550,9 @@ def opCreateTermWindow(cmdString):
 def opJustLogIt(cmdString):
     print_line('opJustLogIt({})'.format(cmdString), debug=True)
 
-def filterThenWrite(rawValue, targetWindow):
-    filteredValue = rawValue.replace(' 13','\n')
-    targetWindow[DEBUG_MULTILINE_KEY].update(filteredValue, append=True)
 
 def opSendToWindow(cmdString):
+    global windowCloseRequested
     lineParts = cmdString.split()
     print_line('opSendToWindow(window=[{}], value=[{}])'.format(lineParts[1], cmdString), debug=True)
     # EXAMPLE:
@@ -297,9 +560,26 @@ def opSendToWindow(cmdString):
     lineForTerm = ' '.join(lineParts[2:])
     targetWindowName = lineParts[1].replace("`", '')
     if existsNamedWindow(targetWindowName):
+        windowCloseRequested = False
         targetWindow = getNamedWindow(targetWindowName)
-        filterThenWrite(lineForTerm, targetWindow)
+        targetWindowType = getTypeForNamedWindow(targetWindowName)
+        windowWriteFunction = functionForWrite(targetWindowType)
+        windowWriteFunction(lineForTerm, targetWindow)
+        # if line contained a 'close' then let's close our window
+        if windowCloseRequested == True:
+            removeNamedWindow(targetWindowName)
+            targetWindow.close()
 
+
+def functionForWrite(opId):
+    table = {
+        kWindowTypeTerm : feedTermWindow,
+    }
+    # get() method of dictionary data type returns
+    # value of passed argument if it is present
+    # in dictionary otherwise second argument will
+    # be assigned as default value of passed argument
+    return table.get(opId, feedBadWindowType)
 
 def functionForCommand(opId):
     table = {
@@ -316,31 +596,20 @@ def functionForCommand(opId):
 
 DEBUG_MULTILINE_KEY = '-OUTPUT-'+sg.WRITE_ONLY_KEY
 debugLogWindow = ''
-defaultTextColor = 'green'
 
 def debugLogClear():
     debugLogWindow[DEBUG_MULTILINE_KEY].update('')
 
-def debugLogPrint(text, color=defaultTextColor, bgColor=''):
-    if color == '' and bgColor == '':
-        debugLogWindow[DEBUG_MULTILINE_KEY].update(text, append=True)
-    elif color != '' and bgColor == '':
-        debugLogWindow[DEBUG_MULTILINE_KEY].update(text, text_color_for_value=color, append=True)
-    elif color == '' and bgColor != '':
-        debugLogWindow[DEBUG_MULTILINE_KEY].update(text, background_color_for_value=bgColor, append=True)
-    else:
-        debugLogWindow[DEBUG_MULTILINE_KEY].update(text, text_color_for_value=color, background_color_for_value=bgColor, append=True)
+def debugLogPrint(text, fgColor=clGreen, bgColor=clBlack):
+    debugLogWindow[DEBUG_MULTILINE_KEY].update(text, text_color=fgColor, background_color=bgColor, text_color_for_value=fgColor, background_color_for_value=bgColor, append=True)
 
 def SetUpDebugLogWindow():
     global debugViewsShowing
     global debugLogWindow
     debugViewsShowing = True
     # create our default log display window
-    layout = [ [sg.Multiline(size=(80,24), autoscroll=True, key=DEBUG_MULTILINE_KEY)],
-               [sg.Button('Clear'), sg.Button('Exit')]  ]
-
-    window = sg.Window('DEBUG Output', layout, finalize=True)
-    debugLogWindow = window
+    layout = [ [sg.Multiline(size=(80,24), background_color=clBlack, font=("Helvetica", DefaultTextSize), write_only=True, autoscroll=True, key=DEBUG_MULTILINE_KEY)] ]
+    debugLogWindow = sg.Window('DEBUG Output', layout, finalize=True)
 
 def processDebugLine(debug_text):
     # if our debug output log window not showing show it
@@ -348,7 +617,6 @@ def processDebugLine(debug_text):
         SetUpDebugLogWindow()
         debugLogClear()
 
-    #
     # EXAMPLES:
     # Cog0  INIT $0000_0000 $0000_0000 load
     # Cog0  INIT $0000_0D58 $0000_1248 jump
@@ -357,10 +625,12 @@ def processDebugLine(debug_text):
     lineParts = debug_text.split()
 
         #  process a line of P2 DEBUG output
-    textColor = defaultTextColor
+    textColor = clGreen
     if lineParts[1] == 'INIT':
-        textColor = 'blue'
-    debugLogPrint(debug_text, color=textColor)
+        textColor = clBlue
+    elif lineParts[1] == '`term':
+        textColor = clOrange
+    debugLogPrint(debug_text.rstrip() + '\n', fgColor=textColor)
 
     if len(lineParts) > 1:
         # [0] is cog ID
@@ -368,7 +638,9 @@ def processDebugLine(debug_text):
         operation = functionForCommand(lineParts[1])
         operation(debug_text)
 
+
 kWindowReadTimeoutIn_mSec = 10
+
 def mainLoop():
     while True:             # Event Loop
         if debugViewsShowing == True:
@@ -387,8 +659,14 @@ def mainLoop():
     print_line('Debug Window EXIT', debug=True)
 
 
-_thread.start_new_thread(processInput, ( ))
+# -----------------------------------------------------------------------------
+#  Main loop
+# -----------------------------------------------------------------------------
 
+# start our input task
+_thread.start_new_thread(taskProcessInput, ( ))
+
+# run our loop
 try:
     mainLoop()
 
