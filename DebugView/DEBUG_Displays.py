@@ -89,7 +89,8 @@ lineBuffer = deque()
 
 def pushLine(newLine):
     lineBuffer.append(newLine)
-    if len(lineBuffer) % 10 == 0:
+    # show debug every 100 lines more added
+    if len(lineBuffer) % 100 == 0:
         print_line('- lines({})'.format(len(lineBuffer)),debug=True)
 
 def popLine():
@@ -641,7 +642,7 @@ def processDebugLine(debug_text):
         operation(debug_text)
 
 
-kWindowReadTimeoutIn_mSec = 10
+kWindowReadTimeoutIn_mSec = 1
 
 def mainLoop():
     while True:             # Event Loop
