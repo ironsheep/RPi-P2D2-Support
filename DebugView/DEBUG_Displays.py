@@ -423,12 +423,12 @@ def buildTermList(rawValue):
                 # start a new string
                 currString = currPart
                 inString = True
-        elif currPart in kTermControlList:
+        elif currPart.upper() in kTermControlList:
             # have numeric directive!
-            if currPart == 'CLEAR':  # have 2nd form of clear, make it first form
+            if currPart.upper() == 'CLEAR':  # have 2nd form of clear, make it first form
                 # have clear screen
                 desiredOperations.append( ( '0', '' ) )
-            elif currPart == '2' or currPart == '3' or currPart == 'SAVE':  # have ROW
+            elif currPart == '2' or currPart == '3' or currPart.upper() == 'SAVE':  # have ROW
                 # MAYBE BUG: fix whitespace in filename case?!
                 newOpTuple  = ( currPart, lineParts[partIndex + 1] )
                 skipNext = True

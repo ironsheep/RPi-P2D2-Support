@@ -117,8 +117,21 @@ to /boot/config.txt we can now select a 2Mb/s rate. (*yes, testing shows this wo
 *Please remember that after adjusting these /boot/ files your changes do not take affect until you reboot the RPi.*
 
 ## Interface: SPI0
+Enable the SPI interface using raspi-config. From general information found at raspberrypi.org <sup name="a6">[6](#f6)</sup> we see that there are three SPI controllers but only SPI0 is available at our header. We can configure the SPI mode (Standard, Bidirectional and LoSSI.) The driver supports a number of SCLK speeds but this has changed over time.<sup name="a7">[7](#f7)</sup> There is a description of the 2nd SPI1 device appearing on the 40-pin header. <sup name="a8">[8](#f9)</sup> 
 
-... TBA ...
+The most commonly used Python library appears to be [Spidev](https://pypi.org/project/spidev/) which is installable on our RPi's using `sudo apt-get install python3-spidev`.  The project website has examples of use and there are many other open source projects using it as well which serve as good examples.
+
+It is easy to tell if you already have the SPI interface enabled using a simply command:
+
+```
+ls /dev/spi*
+# which yields somthing like (only if the driver is loaded):
+crw-rw---- 1 root spi 153, 0 Aug 31 18:23 /dev/spidev0.0
+crw-rw---- 1 root spi 153, 1 Aug 31 18:23 /dev/spidev0.1
+```
+
+**NOTE:** Our SPI0 interface is `/dev/spidev0.0`.
+
 
 ## Interface: I2C SD/SC (Hat ID ROM)
 
@@ -126,7 +139,7 @@ to /boot/config.txt we can now select a 2Mb/s rate. (*yes, testing shows this wo
 
 ## Interface: Non-tasked GPIOs
 
-If you are using the remaining 15 non-purposed GPIOs then when you decide the purpose and configuration needed for a pin you can set a boot-time configuration entry so the pin you need will be configured correctly from boot.  Entries to do this are placed in ```/boot/config.txt``` <sup name="a6">[6](#f6)</sup>
+If you are using the remaining 15 non-purposed GPIOs then when you decide the purpose and configuration needed for a pin you can set a boot-time configuration entry so the pin you need will be configured correctly from boot.  Entries to do this are placed in ```/boot/config.txt``` <sup name="a9">[9](#f9)</sup>
 
 ## Special Setup Notes
 
@@ -191,15 +204,21 @@ If this isn't the chip that your RPi contains, doing a simple search for your BC
 
 <b id="f1">[1]:</b> Raspberry Pi Forums: [1-Wire Setup Questions](https://www.raspberrypi.org/forums/viewtopic.php?t=176406) various answers but the raspi-config method is the easiest and configures the extra dirver loading, etc. [↩](#a1)
 
-<b id="f2">[2]:</b> Raspberry Pi Doumentation: [UARTs](https://www.raspberrypi.org/documentation/configuration/uart.md) [↩](#a2)
+<b id="f2">[2]:</b> Raspberry Pi Documentation: [UARTs](https://www.raspberrypi.org/documentation/configuration/uart.md) [↩](#a2)
 
-<b id="f3">[3]:</b> Raspberry Pi Doumentation - [UART configuration overlays](https://www.raspberrypi.org/documentation/configuration/uart.md). Scroll down to: "UARTs and Device Tree" [↩](#a3)
+<b id="f3">[3]:</b> Raspberry Pi Documentation - [UART configuration overlays](https://www.raspberrypi.org/documentation/configuration/uart.md). Scroll down to: "UARTs and Device Tree" [↩](#a3)
 
 <b id="f4">[4]:</b> Raspberry Pi Forums: [Can the UART go faster than 115200?](https://www.raspberrypi.org/forums/viewtopic.php?t=73673) Lot's of repeat information in here along with the details we need.[↩](#a4)
 
 <b id="f5">[5]:</b> Raspberry Pi Forums: [Set VNC resolution?](https://www.raspberrypi.org/forums/viewtopic.php?t=200196) (Scroll down to Thu Jan 04,2018 10:20pm post.)[↩](#a5)
 
-<b id="f6">[6]:</b> Raspberry Pi Doumentation: [GPIO Control in config.txt](https://www.raspberrypi.org/documentation/configuration/config-txt/gpio.md) read this to learn entry needed for each of the 15 GPIO pins you want to boot-time configure.[↩](#a6)
+<b id="f6">[6]:</b> Raspberry Pi Documentation: [SPI](https://www.raspberrypi.org/documentation/hardware/raspberrypi/spi/README.md) [↩](#a6)
+
+<b id="f7">[7]:</b> Raspberry Pi Forum Thread: [More SPI Speeds](https://www.raspberrypi.org/forums/viewtopic.php?f=44&t=43442&p=347073) [↩](#a7)
+
+<b id="f8">[8]:</b> eLinux.org Raspberry Pi Page: [RPi SPI](https://elinux.org/index.php?title=RPi_SPI) [↩](#a8)
+
+<b id="f9">[9]:</b> Raspberry Pi Documentation: [GPIO Control in config.txt](https://www.raspberrypi.org/documentation/configuration/config-txt/gpio.md) read this to learn entry needed for each of the 15 GPIO pins you want to boot-time configure.[↩](#a9)
 
 ---
 
