@@ -69,15 +69,32 @@ As with any embedded system with many I/O choices sometimes tradeoffs have to be
 
 
 ## Interface: I2C0
+Enable the I2C interface using raspi-config. From what I can find, by default the I2C clock is 100KHz. This can be adjusted up to a max of 400KHz. <sup name="ai1">[I1](#fi1)</sup>  Also, there are posts that suggest that I2C on the RPi can only work at these two frequencies.<sup name="ai2">[I2](#fi2)</sup>
 
-... TBA ...
+we modify the I2C clock speed by adjusting values in the in `/boot/config.txt` file.
+Look for:
+
+```shell
+dtparam=i2c_arm=on
+``` 
+
+and add a new line setting the desired clock speed:
+
+```shell
+dtparam=i2c_arm=on
+i2c_arm_baudrate=400000
+``` 
+
+This selects our new 400Kb/s rate.
+
+*Please remember that after adjusting these /boot/ files your changes do not take affect until you reboot the RPi.*
 
 ## Interface: 1-Wire
 
-Enable the 1-wire interface using raspi-config. There are options for enabling a pull-up on the GPIO pin but most people just wire up their own external resistor.  The driver should default to the GPIO4 pin but it never hurts to double check. <sup name="a1">[1](#f1)</sup>
+Enable the 1-wire interface using raspi-config. There are options for enabling a pull-up on the GPIO pin but most people just wire up their own external resistor.  The driver should default to the GPIO4 pin but it never hurts to double check. <sup name="ao1">[O1](#fo1)</sup>
 
 ## Interface: Serial: UART0
-There are two hardware UARTs: miniUART and PL011 that are configured to be primary and secondary on RPi3 and RPI4. (earlier models are different!) <sup name="a2">[2](#f2)</sup> and four additional UARTs [2-5] <sup name="a3">[3](#f3)</sup>.
+There are two hardware UARTs: miniUART and PL011 that are configured to be primary and secondary on RPi3 and RPI4. (earlier models are different!) <sup name="au1">[U1](#fu1)</sup> and four additional UARTs [2-5] <sup name="au2">[U2](#fu2)</sup>.
 
 ### MiniUART (less capable, but fully meets our normal debugging needs)
 
@@ -106,7 +123,7 @@ As an RPi user it is probably cleaner to make as much configuration change as yo
 You will need to fix clock frequency (and/or configure which UARTs do what) by modifying the files directly. You can modify these files by hand using 'vi' or 'nano' as your editor but this is slightly  more error prone so we want to be very deliberate here. (You don't want typo's or mis-spellings in these files as stuff just doesn't work right where there are...)
 
 To get to our 2Mb/s we need to adjust the clock fed to the UART. The setting needs to be 
-at least 16X faster than the baud rate we want for our uart. The default is only 3MHz which results in just a little over 115200. So at the default setting, the max UART baud rate is 115200. <sup name="a5">[5](#f5)</sup>
+at least 16X faster than the baud rate we want for our uart. The default is only 3MHz which results in just a little over 115200. So at the default setting, the max UART baud rate is 115200. <sup name="au3">[U3](#fu3)</sup>
 
 Therefore by adding 
 ```
@@ -117,7 +134,7 @@ to /boot/config.txt we can now select a 2Mb/s rate. (*yes, testing shows this wo
 *Please remember that after adjusting these /boot/ files your changes do not take affect until you reboot the RPi.*
 
 ## Interface: SPI0
-Enable the SPI interface using raspi-config. From general information found at raspberrypi.org <sup name="a6">[6](#f6)</sup> we see that there are three SPI controllers but only SPI0 is available at our header. We can configure the SPI mode (Standard, Bidirectional and LoSSI.) The driver supports a number of SCLK speeds but this has changed over time.<sup name="a7">[7](#f7)</sup> There is a description of the 2nd SPI1 device appearing on the 40-pin header. <sup name="a8">[8](#f9)</sup> 
+Enable the SPI interface using raspi-config. From general information found at raspberrypi.org <sup name="as1">[S1](#fs1)</sup> we see that there are three SPI controllers but only SPI0 is available at our header. We can configure the SPI mode (Standard, Bidirectional and LoSSI.) The driver supports a number of SCLK speeds but this has changed over time.<sup name="as2">[S2](#fs2)</sup> There is a description of the 2nd SPI1 device appearing on the 40-pin header. <sup name="as3">[S3](#fs3)</sup> 
 
 The most commonly used Python library appears to be [Spidev](https://pypi.org/project/spidev/) which is installable on our RPi's using `sudo apt-get install python3-spidev`.  The project website has examples of use and there are many other open source projects using it as well which serve as good examples.
 
@@ -139,7 +156,7 @@ crw-rw---- 1 root spi 153, 1 Aug 31 18:23 /dev/spidev0.1
 
 ## Interface: Non-tasked GPIOs
 
-If you are using the remaining 15 non-purposed GPIOs then when you decide the purpose and configuration needed for a pin you can set a boot-time configuration entry so the pin you need will be configured correctly from boot.  Entries to do this are placed in ```/boot/config.txt``` <sup name="a9">[9](#f9)</sup>
+If you are using the remaining 15 non-purposed GPIOs then when you decide the purpose and configuration needed for a pin you can set a boot-time configuration entry so the pin you need will be configured correctly from boot.  Entries to do this are placed in ```/boot/config.txt``` <sup name="ag1">[G1](#fg1)</sup>
 
 ## Special Setup Notes
 
@@ -171,7 +188,7 @@ The first (1) enable VNC(SSH), (2) enable headless mode and (3) set resolution a
 
 (now your RPi will reboot if changes were made.)
 
-For (4) I found that on RPi4's there's a video driver enabled by default which interferes and is enabled in /boot/config.txt:
+For (4) I found that on RPi4's there's a video driver enabled by default which interferes and is enabled in /boot/config.txt <sup name="av1">[V1](#fv1)</sup>:
 
 ```shell
 [pi4]
@@ -180,7 +197,7 @@ droverlay=vc4-fkms-v3d
 max_framebuffers=2 
 ```
 
-I commented all of these lines out and my RP4 can now display a larger screen when run by VNC.
+I commented out **all of these lines** and my RP4 can now display a larger screen when run by VNC.
 
 ### Detailed I/O Reference for your Raspberry Pi
 
@@ -202,24 +219,29 @@ If this isn't the chip that your RPi contains, doing a simple search for your BC
 ### FOOTNOTES
 *(click the return arrow to get back to the referencing text)*
 
-<b id="f1">[1]:</b> Raspberry Pi Forums: [1-Wire Setup Questions](https://www.raspberrypi.org/forums/viewtopic.php?t=176406) various answers but the raspi-config method is the easiest and configures the extra dirver loading, etc. [↩](#a1)
 
-<b id="f2">[2]:</b> Raspberry Pi Documentation: [UARTs](https://www.raspberrypi.org/documentation/configuration/uart.md) [↩](#a2)
+<b id="fi1">[I1]:</b> Raspberry Pi Spy website: [Change Raspberry Pi I2C Bus Speed](https://www.raspberrypi-spy.co.uk/2018/02/change-raspberry-pi-i2c-bus-speed/) this shows /boot/config.txt changes to make to affect I2C master clock. [↩](#ai1)
 
-<b id="f3">[3]:</b> Raspberry Pi Documentation - [UART configuration overlays](https://www.raspberrypi.org/documentation/configuration/uart.md). Scroll down to: "UARTs and Device Tree" [↩](#a3)
+<b id="fi2">[I2]:</b> Raspberry Pi Forums: [Raspberry Pi3 I2C baud rate setting](https://www.raspberrypi.org/forums/viewtopic.php?t=219675)  (Scroll down to Sat Aug 04, 2018 8:33 am post.)[↩](#ai2)
 
-<b id="f4">[4]:</b> Raspberry Pi Forums: [Can the UART go faster than 115200?](https://www.raspberrypi.org/forums/viewtopic.php?t=73673) Lot's of repeat information in here along with the details we need.[↩](#a4)
+<b id="fo1">[O1]:</b> Raspberry Pi Forums: [1-Wire Setup Questions](https://www.raspberrypi.org/forums/viewtopic.php?t=176406) various answers but the raspi-config method is the easiest and configures the extra dirver loading, etc. [↩](#ao1)
 
-<b id="f5">[5]:</b> Raspberry Pi Forums: [Set VNC resolution?](https://www.raspberrypi.org/forums/viewtopic.php?t=200196) (Scroll down to Thu Jan 04,2018 10:20pm post.)[↩](#a5)
+<b id="fu1">[U1]:</b> Raspberry Pi Documentation: [UARTs](https://www.raspberrypi.org/documentation/configuration/uart.md) [↩](#au1)
 
-<b id="f6">[6]:</b> Raspberry Pi Documentation: [SPI](https://www.raspberrypi.org/documentation/hardware/raspberrypi/spi/README.md) [↩](#a6)
+<b id="fu2">[U2]:</b> Raspberry Pi Documentation - [UART configuration overlays](https://www.raspberrypi.org/documentation/configuration/uart.md). Scroll down to: "UARTs and Device Tree" [↩](#a3)
 
-<b id="f7">[7]:</b> Raspberry Pi Forum Thread: [More SPI Speeds](https://www.raspberrypi.org/forums/viewtopic.php?f=44&t=43442&p=347073) [↩](#a7)
+<b id="fu3">[U3]:</b> Raspberry Pi Forums: [Can the UART go faster than 115200?](https://www.raspberrypi.org/forums/viewtopic.php?t=73673) Lot's of repeat information in here along with the details we need.[↩](#au3)
 
-<b id="f8">[8]:</b> eLinux.org Raspberry Pi Page: [RPi SPI](https://elinux.org/index.php?title=RPi_SPI) [↩](#a8)
 
-<b id="f9">[9]:</b> Raspberry Pi Documentation: [GPIO Control in config.txt](https://www.raspberrypi.org/documentation/configuration/config-txt/gpio.md) read this to learn entry needed for each of the 15 GPIO pins you want to boot-time configure.[↩](#a9)
+<b id="fs1">[S1]:</b> Raspberry Pi Documentation: [SPI](https://www.raspberrypi.org/documentation/hardware/raspberrypi/spi/README.md) [↩](#as1)
 
+<b id="fs2">[S2]:</b> Raspberry Pi Forum Thread: [More SPI Speeds](https://www.raspberrypi.org/forums/viewtopic.php?f=44&t=43442&p=347073) [↩](#as2)
+
+<b id="fs3">[S3]:</b> eLinux.org Raspberry Pi Page: [RPi SPI](https://elinux.org/index.php?title=RPi_SPI) [↩](#as3)
+
+<b id="fg1">[G1]:</b> Raspberry Pi Documentation: [GPIO Control in config.txt](https://www.raspberrypi.org/documentation/configuration/config-txt/gpio.md) read this to learn entry needed for each of the 15 GPIO pins you want to boot-time configure.[↩](#ag1)
+
+<b id="fv1">[V1]:</b> Raspberry Pi Forums: [Set VNC resolution?](https://www.raspberrypi.org/forums/viewtopic.php?t=200196) (Scroll down to Thu Jan 04,2018 10:20pm post.)[↩](#av1)
 ---
 
 ## Credits
