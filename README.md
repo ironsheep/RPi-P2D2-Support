@@ -35,10 +35,29 @@ Here is the header as shown in Peter's P2D2 r5 documents:
 
 ![Pinout](Images/RPi-Header.png)
 
+Things we are learning:
+
+| RPi Interface | max clock freq |
+| ------------- | -------------- |
+| I2C(1) | 400 KHz |
+| 1-wire | ??? |
+| UART(0) | > 2 MHz |
+| SPI(0) | 125 MHz |
+| I2C ID | 400 KHz |
+
+*I'll keep adjusting this table as I learn more...*
 
 ## The Raspberry Pi (RPi)
 
 Raspberry Pi's are fairly inexpensive devices and all software for them, operating system, applications are free.  RPi's such at the RPi4 with its 8GB ram is touted to be a nearly desktop class linux machine. It is well connected, offering WiFi, wired ethernet, and bluetooth interfaces, USB 2.0 and 3.0. It has wonderfully high resolution (up to 4k 60fps) HDMI output and it has world class open source data analysis and visualization tools available at no cost (open source.)
+
+There many different models of the Raspberry Pi. It can be hard to know what capabilities you have on a specific instance of RPi that you may have.
+
+Here are two sources i like to use when I need more detail on one of mine:
+
+The WikipediA page: [Raspberry Pi](https://en.wikipedia.org/wiki/Raspberry_Pi)
+
+and the FAQ Rasperrypi.org page: [FAQs](https://www.raspberrypi.org/documentation/faqs/) which leads me to many more useful details.
 
 ### Configuration Opportunities
 
@@ -60,6 +79,16 @@ Then there are things we'd like to do but have yet to figure out how:
 
 As with any embedded system with many I/O choices sometimes tradeoffs have to be made to use certain capabilities (to get one to operate maybe you have to disable another, etc.)  I put this README together so I could annotate here for us all any such tradeoff issues I find.  So far, the Serial port is the one where we have more choices to make. The following sections (one for each interface) provide any details I've found to date.
 
+**NOTE: the number of SPI, I2C, or UARTs you have** depends upon the model of Broadcom SoC chip used on your RPi [[BCM2711](https://www.raspberrypi.org/documentation/hardware/raspberrypi/bcm2711/README.md), [BCM2835](https://www.raspberrypi.org/documentation/hardware/raspberrypi/bcm2835/README.md), [BCM2836](https://www.raspberrypi.org/documentation/hardware/raspberrypi/bcm2836/README.md), BCM2837A0, [BCM2837B0](https://www.raspberrypi.org/documentation/hardware/raspberrypi/bcm2837b0/README.md), etc.].  Go to [The computer hardware](https://www.raspberrypi.org/documentation/faqs/#hardware) section of the RPi FAQ to determing which you have!
+
+Or, have a little fun with entering this on your RPi in question:
+
+```shell
+cat /proc/cpuinfo | grep Hardware
+```
+
+(*your RPi whill tell you which BCM chip it has!*)
+
 **NOTE: Turn on Interfaces you need.** The hardware interfaces at the GPIO connector are generally turned off by default. You will want to use **raspi-config** to enable each of the interfaces you wish to use.  
 
 **Language Choices:** I tend to use Python or ANSI C for interacting with the various devices as there are a lot of rich examples and library support. However there are a number of other languages you could choose to use.  
@@ -70,6 +99,19 @@ As with any embedded system with many I/O choices sometimes tradeoffs have to be
 
 ## Interface: I2C0
 Enable the I2C interface using raspi-config. From what I can find, by default the I2C clock is 100KHz. This can be adjusted up to a max of 400KHz. <sup name="ai1">[I1](#fi1)</sup>  Also, there are posts that suggest that I2C on the RPi can only work at these two frequencies.<sup name="ai2">[I2](#fi2)</sup>
+
+There are 
+
+By default some useful I2C tools are not installed.  Install them with:
+
+```shell
+sudo apt-get update
+sudo apt-get install i2c-tools
+```
+
+The most commonly used Python library appears to be [SMBus](https://pypi.org/project/smbus2/) which is installable on our RPi's using `sudo apt-get install python3-smbus`.  The project website has examples of use and there are many other open source projects using it as well which serve as good examples.
+
+### I2C Clock Speed
 
 we modify the I2C clock speed by adjusting values in the in `/boot/config.txt` file.
 Look for:
@@ -88,6 +130,20 @@ i2c_arm_baudrate=400000
 This selects our new 400Kb/s rate.
 
 *Please remember that after adjusting these /boot/ files your changes do not take affect until you reboot the RPi.*
+
+### I2C Enabled Check
+
+It is easy to tell if you already have the I2C interface enabled using a simply command:
+
+```
+ls /dev/i2c*
+# which yields somthing like (only if the driver is loaded):
+crw-rw---- 1 root i2c 89, 1 Sep  1 13:17 /dev/i2c-1
+
+```
+
+**NOTE:** Our I2C0 interface is `/dev/i2c-1`.
+
 
 ## Interface: 1-Wire
 
@@ -137,6 +193,8 @@ to /boot/config.txt we can now select a 2Mb/s rate. (*yes, testing shows this wo
 Enable the SPI interface using raspi-config. From general information found at raspberrypi.org <sup name="as1">[S1](#fs1)</sup> we see that there are three SPI controllers but only SPI0 is available at our header. We can configure the SPI mode (Standard, Bidirectional and LoSSI.) The driver supports a number of SCLK speeds but this has changed over time.<sup name="as2">[S2](#fs2)</sup> There is a description of the 2nd SPI1 device appearing on the 40-pin header. <sup name="as3">[S3](#fs3)</sup> 
 
 The most commonly used Python library appears to be [Spidev](https://pypi.org/project/spidev/) which is installable on our RPi's using `sudo apt-get install python3-spidev`.  The project website has examples of use and there are many other open source projects using it as well which serve as good examples.
+
+### SPI Enabled Check
 
 It is easy to tell if you already have the SPI interface enabled using a simply command:
 
