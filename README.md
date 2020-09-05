@@ -40,8 +40,9 @@ Things we are learning:
 | RPi Interface | max clock freq |
 | ------------- | -------------- |
 | I2C(1) | 400 KHz |
-| 1-wire | ??? |
-| UART(0) | > 2 MHz |
+| 1-wire | ~16.3 Kbps (163 Kbps overdrive mode) bps because not standard clock! [NOTE](https://en.wikipedia.org/wiki/1-Wire) WikipediA |
+| UART(0) PL011 | 3 MHz [NOTE](https://www.raspberrypi.org/forums/viewtopic.php?t=226881#:~:text=Re%3A%20RPI%203%20UART%20max%20speed&text=The%20RPi%20has%202%20UARTs,sec%20(48MHz%2F16).) forum thread
+| UART(0) miniUART | ~31.25 MHz (acutal baud lower than expected and is based on VPU clock so it can be affected by temperature throttleing or overclocking) [NOTE](https://www.raspberrypi.org/forums/viewtopic.php?t=271783) forum thread |
 | SPI(0) | 125 MHz |
 | I2C ID | 400 KHz |
 
