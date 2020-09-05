@@ -290,7 +290,6 @@ If this isn't the chip that your RPi contains, doing a simple search for your BC
 
 <b id="fu3">[U3]:</b> Raspberry Pi Forums: [Can the UART go faster than 115200?](https://www.raspberrypi.org/forums/viewtopic.php?t=73673) Lot's of repeat information in here along with the details we need.[↩](#au3)
 
-
 <b id="fs1">[S1]:</b> Raspberry Pi Documentation: [SPI](https://www.raspberrypi.org/documentation/hardware/raspberrypi/spi/README.md) [↩](#as1)
 
 <b id="fs2">[S2]:</b> Raspberry Pi Forum Thread: [More SPI Speeds](https://www.raspberrypi.org/forums/viewtopic.php?f=44&t=43442&p=347073) [↩](#as2)
@@ -300,6 +299,7 @@ If this isn't the chip that your RPi contains, doing a simple search for your BC
 <b id="fg1">[G1]:</b> Raspberry Pi Documentation: [GPIO Control in config.txt](https://www.raspberrypi.org/documentation/configuration/config-txt/gpio.md) read this to learn entry needed for each of the 15 GPIO pins you want to boot-time configure.[↩](#ag1)
 
 <b id="fv1">[V1]:</b> Raspberry Pi Forums: [Set VNC resolution?](https://www.raspberrypi.org/forums/viewtopic.php?t=200196) (Scroll down to Thu Jan 04,2018 10:20pm post.)[↩](#av1)
+
 ---
 
 ## Credits
