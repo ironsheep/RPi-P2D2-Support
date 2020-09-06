@@ -145,6 +145,9 @@ crw-rw---- 1 root i2c 89, 1 Sep  1 13:17 /dev/i2c-1
 
 **NOTE:** Our I2C0 interface is `/dev/i2c-1`.
 
+### Example, working Python
+
+[Dual I2C and SPI Python Library for AS3935](https://github.com/ironsheep/lightning-detector-MQTT2HA-Daemon/blob/master/AS3935/AS3935_i2c_spi.py) I have this code running for my lightning detector reporting script. Part of my [Lightning Detector MQTT2HA Daemon](https://github.com/ironsheep/lightning-detector-MQTT2HA-Daemon) project
 
 ## Interface: 1-Wire
 
@@ -208,6 +211,11 @@ crw-rw---- 1 root spi 153, 1 Aug 31 18:23 /dev/spidev0.1
 
 **NOTE:** Our SPI0 interface is `/dev/spidev0.0`.
 
+### Example, working Python
+
+SPI is bit of a different animal on Python as you have to construct the read-write primitives for your device. Her are some of my notes: [Theory of Operations: SPI for AS3935](https://github.com/ironsheep/lightning-detector-MQTT2HA-Daemon/blob/master/THEOPS-SPI.md)
+
+[Dual I2C and SPI Python Library for AS3935](https://github.com/ironsheep/lightning-detector-MQTT2HA-Daemon/blob/master/AS3935/AS3935_i2c_spi.py) I have this code running for my lightning detector reporting script. Part of my [Lightning Detector MQTT2HA Daemon](https://github.com/ironsheep/lightning-detector-MQTT2HA-Daemon) project
 
 ## Interface: I2C SD/SC (Hat ID ROM)
 
