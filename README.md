@@ -48,13 +48,13 @@ Things we are learning:
 
 *I'll keep adjusting this table as I learn more...*
 
--
+----
 
 If you like my work and/or this has helped you in some way then feel free to help me out for a couple of :coffee:'s or :pizza: slices!
 
 [![coffee](https://www.buymeacoffee.com/assets/img/custom_images/black_img.png)](https://www.buymeacoffee.com/ironsheep)
 
--
+----
 
 ## The Raspberry Pi (RPi)
 
