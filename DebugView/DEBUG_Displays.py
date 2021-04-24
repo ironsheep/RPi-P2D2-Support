@@ -61,25 +61,40 @@ def print_line(text, error=False, warning=False, info=False, verbose=False, debu
 opt_debug = False
 opt_verbose = False
 opt_useTestFile = False
+opt_logging = False
 
 # Argparse
 parser = argparse.ArgumentParser(description=project_name, epilog='For further details see: ' + project_url)
 parser.add_argument("-v", "--verbose", help="increase output verbosity", action="store_true")
 parser.add_argument("-d", "--debug", help="show debug output", action="store_true")
 parser.add_argument("-t", "--test", help="run from canned test file", action="store_true")
+parser.add_argument("-l", '--log_filename', help='write all debug messages to log file', default='')
 parse_args = parser.parse_args()
 
 opt_debug = parse_args.debug
 opt_verbose = parse_args.verbose
 opt_useTestFile = parse_args.test
+log_filename = parse_args.log_filename
+opt_logging = len(log_filename) > 0
 
 print_line(script_info, info=True)
 if opt_verbose:
     print_line('Verbose enabled', info=True)
 if opt_debug:
     print_line('Debug enabled', debug=True)
+if opt_logging:
+    print_line('Logging to: {}'.format(log_filename), debug=True)
 if opt_useTestFile:
     print_line('TEST: debug stream is test file', debug=True)
+
+log_fp = None
+if opt_logging:
+    if os.path.exists(log_filename):
+        print_line('Log {} already exists, Aborting!'.format(log_filename), error=True)
+        os._exit(1)
+    else:
+        print_line("Logging started", debug=True)
+        log_fp = open(log_filename, "w")
 
 # -----------------------------------------------------------------------------
 #  Circular queue for serial input lines & input task
@@ -620,6 +635,9 @@ def processDebugLine(debug_text):
         SetUpDebugLogWindow()
         debugLogClear()
 
+    if opt_logging:
+        log_fp.write(debug_text + '\n')
+
     # EXAMPLES:
     # Cog0  INIT $0000_0000 $0000_0000 load
     # Cog0  INIT $0000_0D58 $0000_1248 jump
@@ -660,7 +678,8 @@ def mainLoop():
 
     debugLogWindow.close()
     print_line('Debug Window EXIT', debug=True)
-
+    if opt_logging:
+        log_fp.close()
 
 # -----------------------------------------------------------------------------
 #  Main loop
