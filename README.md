@@ -342,6 +342,7 @@ If this isn't the chip that your RPi contains, doing a simple search for your BC
 ### [Copyright](copyright) | [License](LICENSE)
 
 [commits-shield]: https://img.shields.io/github/commit-activity/y/ironsheep/RPi-P2D2-Support.svg?style=for-the-badge
+
 [commits]: https://github.com/ironsheep/RPi-P2D2-Support/commits/master
 
 [license-shield]: https://img.shields.io/github/license/ironsheep/RPi-P2D2-Support.svg?style=for-the-badge
