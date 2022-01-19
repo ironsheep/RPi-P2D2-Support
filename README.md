@@ -1,4 +1,4 @@
-# RPi-P2D2-Support
+# RPi-P2D2-Support - Quickly learn how to configure your RPi for use with your P2
 ![Project Maintenance][maintenance-shield]
 
 [![GitHub Activity][commits-shield]][commits]
@@ -47,6 +47,10 @@ Things we are learning:
 | I2C ID | 400 KHz |
 
 *I'll keep adjusting this table as I learn more...*
+
+**Needed Reference** As you are adjusting configuration of your RPi you will frequently find yourself using the **raspi-config** tool. The best reference I've found for this is: [The raspi-config Tool](https://www.raspberrypi.com/documentation/computers/configuration.html)
+
+Likewise as you are wandering the varous interfaces looking for more details checkout [pinout.xyz](https://pinout.xyz/) an interactive GPIO header with descriptions of each interface.
 
 ----
 
